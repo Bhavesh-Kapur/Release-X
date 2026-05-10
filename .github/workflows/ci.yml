@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   ci:
@@ -22,21 +23,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ---------------- Checkout ----------------
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       # ---------------- Security Scans ----------------
 
-      - name: Install Trivy
-        uses: aquasecurity/setup-trivy@v0.2.0
-
       - name: Run Trivy Scan
         continue-on-error: true
-        run: |
-          trivy fs . \
-          --severity HIGH,CRITICAL \
-          --format table \
-          --output trivy-report.txt || true
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          format: table
+          output: trivy-report.txt
 
       - name: OWASP Dependency Check
         continue-on-error: true
@@ -61,7 +63,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # ---------------- Docker Build ----------------
+      # ---------------- Docker Login ----------------
 
       - name: Docker Login
         if: github.event_name != 'pull_request'
@@ -70,17 +72,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # ---------------- Docker Build ----------------
+
       - name: Build Backend Image
         run: |
           docker build \
-          -t bhaveshkapur09/wanderlust-backend-beta:${{ github.sha }} \
-          ./backend
+            -t bhaveshkapur09/wanderlust-backend-beta:${{ github.sha }} \
+            ./backend
 
       - name: Build Frontend Image
         run: |
           docker build \
-          -t bhaveshkapur09/wanderlust-frontend-beta:${{ github.sha }} \
-          ./frontend
+            -t bhaveshkapur09/wanderlust-frontend-beta:${{ github.sha }} \
+            ./frontend
+
+      # ---------------- Docker Push ----------------
 
       - name: Push Backend Image
         if: github.event_name != 'pull_request'
