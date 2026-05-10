@@ -1,4 +1,4 @@
-name:  GitOps Update
+name: GitOps Update
 
 on:
   workflow_run:
@@ -10,14 +10,12 @@ permissions:
   contents: write
 
 jobs:
-
   update-manifests:
     runs-on: ubuntu-latest
 
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
@@ -29,11 +27,11 @@ jobs:
 
       - name: Update Backend Manifest
         run: |
-          sed -i "s|image: booraraman/wanderlust-backend-beta:.*|image: booraraman/wanderlust-backend-beta:${IMAGE_TAG}|g" kubernetes/backend.yaml
+          sed -i "s|image: bhaveshkapur09/wanderlust-backend-beta:.*|image: bhaveshkapur09/wanderlust-backend-beta:${IMAGE_TAG}|g" kubernetes/backend.yaml
 
       - name: Update Frontend Manifest
         run: |
-          sed -i "s|image: booraraman/wanderlust-frontend-beta:.*|image: booraraman/wanderlust-frontend-beta:${IMAGE_TAG}|g" kubernetes/frontend.yaml
+          sed -i "s|image: bhaveshkapur09/wanderlust-frontend-beta:.*|image: bhaveshkapur09/wanderlust-frontend-beta:${IMAGE_TAG}|g" kubernetes/frontend.yaml
 
       - name: Commit Changes
         run: |

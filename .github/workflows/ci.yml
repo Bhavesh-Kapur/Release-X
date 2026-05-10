@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -74,24 +73,24 @@ jobs:
       - name: Build Backend Image
         run: |
           docker build \
-          -t booraraman/wanderlust-backend-beta:${{ github.sha }} \
+          -t bhaveshkapur09/wanderlust-backend-beta:${{ github.sha }} \
           ./backend
 
       - name: Build Frontend Image
         run: |
           docker build \
-          -t booraraman/wanderlust-frontend-beta:${{ github.sha }} \
+          -t bhaveshkapur09/wanderlust-frontend-beta:${{ github.sha }} \
           ./frontend
 
       - name: Push Backend Image
         if: github.event_name != 'pull_request'
         run: |
-          docker push booraraman/wanderlust-backend-beta:${{ github.sha }}
+          docker push bhaveshkapur09/wanderlust-backend-beta:${{ github.sha }}
 
       - name: Push Frontend Image
         if: github.event_name != 'pull_request'
         run: |
-          docker push booraraman/wanderlust-frontend-beta:${{ github.sha }}
+          docker push bhaveshkapur09/wanderlust-frontend-beta:${{ github.sha }}
 
       # ---------------- Upload Reports ----------------
 
